@@ -139,6 +139,33 @@ class ActionCableConnector extends BaseActionCableConnector {
       this.onTypingOff();
     }, 30000);
   };
+
+  // Tear down the existing widget ActionCable subscription and re-subscribe
+  // with a new pubsub_token. Called from setUser (HMAC identify creates a new
+  // contact_inbox + pubsub_token) and from contact.merged events. Without
+  // this, broadcasts to the new token never reach the widget and the user
+  // has to reload the page to see new messages.
+  static refreshConnector(pubsubToken) {
+    if (!pubsubToken) return null;
+    if (window.chatwootPubsubToken === pubsubToken && window.actionCable) {
+      return window.actionCable;
+    }
+    const existing = window.actionCable;
+    if (existing && typeof existing.disconnect === 'function') {
+      try {
+        existing.disconnect();
+      } catch (_e) {
+        // ignore — the consumer may already be torn down
+      }
+    }
+    if (!window.WOOT_WIDGET) return null;
+    window.chatwootPubsubToken = pubsubToken;
+    window.actionCable = new ActionCableConnector(
+      window.WOOT_WIDGET,
+      pubsubToken
+    );
+    return window.actionCable;
+  }
 }
 
 export default ActionCableConnector;

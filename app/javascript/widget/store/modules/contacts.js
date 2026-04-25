@@ -2,6 +2,7 @@ import { sendMessage } from 'widget/helpers/utils';
 import ContactsAPI from '../../api/contacts';
 import { SET_USER_ERROR } from '../../constants/errorTypes';
 import { setHeader } from '../../helpers/axios';
+import ActionCableConnector from '../../helpers/actionCable';
 const state = {
   currentUser: {},
 };
@@ -73,10 +74,19 @@ export const actions = {
         custom_attributes,
       };
       const {
-        data: { widget_auth_token: widgetAuthToken },
+        data: {
+          widget_auth_token: widgetAuthToken,
+          pubsub_token: pubsubToken,
+        },
       } = await ContactsAPI.setUser(identifier, user);
       updateWidgetAuthToken(widgetAuthToken);
       dispatch('get');
+      // setUser may create a new contact_inbox with a new pubsub_token. The
+      // existing ActionCable subscription is bound to the previous (anonymous)
+      // token, so broadcasts addressed to the new contact never arrive. Force
+      // a re-subscription on the new token before doing anything else that
+      // depends on real-time updates.
+      ActionCableConnector.refreshConnector(pubsubToken);
       if (identifierHash || widgetAuthToken) {
         dispatch('conversation/clearConversations', {}, { root: true });
         dispatch('conversation/fetchOldConversations', {}, { root: true });
