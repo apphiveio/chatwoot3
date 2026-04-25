@@ -1,5 +1,6 @@
 <script>
 import TeamAvailability from 'widget/components/TeamAvailability.vue';
+import WidgetShortcuts from 'widget/components/WidgetShortcuts.vue';
 import { mapGetters } from 'vuex';
 import { useRouter } from 'vue-router';
 import configMixin from 'widget/mixins/configMixin';
@@ -9,6 +10,7 @@ export default {
   components: {
     ArticleContainer,
     TeamAvailability,
+    WidgetShortcuts,
   },
   mixins: [configMixin],
   setup() {
@@ -41,6 +43,8 @@ export default {
       :unread-count="unreadMessageCount"
       @start-conversation="startConversation"
     />
+
+    <WidgetShortcuts />
 
     <ArticleContainer />
   </div>
