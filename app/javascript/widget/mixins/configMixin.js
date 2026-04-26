@@ -1,3 +1,5 @@
+import { pickLocaleWithFallback } from 'widget/helpers/i18nHelper';
+
 export default {
   computed: {
     useInboxAvatarForBot() {
@@ -13,6 +15,25 @@ export default {
     },
     channelConfig() {
       return window.chatwootWebChannel;
+    },
+    // Resolved welcome heading/tagline. Picks a translation from
+    // welcomeTitleI18n / welcomeTaglineI18n (configured per-inbox via
+    // additional_attributes) for the active vue-i18n locale, falling
+    // back to the legacy single-string column managed in the inbox
+    // settings UI.
+    welcomeTitleResolved() {
+      return pickLocaleWithFallback(
+        this.channelConfig.welcomeTitleI18n,
+        this.channelConfig.welcomeTitle,
+        this.$i18n && this.$i18n.locale
+      );
+    },
+    welcomeTaglineResolved() {
+      return pickLocaleWithFallback(
+        this.channelConfig.welcomeTaglineI18n,
+        this.channelConfig.welcomeTagline,
+        this.$i18n && this.$i18n.locale
+      );
     },
     hasEmojiPickerEnabled() {
       return this.channelConfig.enabledFeatures.includes('emoji_picker');

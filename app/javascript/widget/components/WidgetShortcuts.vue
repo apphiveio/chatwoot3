@@ -1,21 +1,9 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { pickLocale } from 'widget/helpers/i18nHelper';
 
 const { locale: i18nLocale } = useI18n();
-
-// Pick a localized value from either a plain string (legacy) or a
-// { es, en, ... } object. Falls back to the first non-empty value.
-const pickLocale = (value, locale) => {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value !== 'object') return String(value);
-  if (value[locale]) return value[locale];
-  if (value.es) return value.es;
-  if (value.en) return value.en;
-  const first = Object.values(value).find(v => v);
-  return first || '';
-};
 
 const rawShortcuts = computed(() => {
   const cfg = window.chatwootWebChannel && window.chatwootWebChannel.widgetShortcuts;

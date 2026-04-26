@@ -39,9 +39,7 @@ export default {
       return !this.isOnHomeView;
     },
     hasIntroText() {
-      return (
-        this.channelConfig.welcomeTitle || this.channelConfig.welcomeTagline
-      );
+      return !!(this.welcomeTitleResolved || this.welcomeTaglineResolved);
     },
     showBackButton() {
       return ['article-viewer', 'messages', 'prechat-form'].includes(
@@ -119,9 +117,9 @@ export default {
       >
         <ChatHeaderExpanded
           v-if="!isHeaderCollapsed"
-          :intro-heading="appConfig.welcomeTitle || channelConfig.welcomeTitle"
+          :intro-heading="appConfig.welcomeTitle || welcomeTitleResolved"
           :intro-body="
-            appConfig.welcomeDescription || channelConfig.welcomeTagline
+            appConfig.welcomeDescription || welcomeTaglineResolved
           "
           :avatar-url="channelConfig.avatarUrl"
           :show-popout-button="appConfig.showPopoutButton"
